@@ -4,6 +4,8 @@ import { ClickParam } from "antd/lib/menu";
 import styled from "styled-components";
 import { Link, withRouter } from "react-router-dom";
 import { useShares } from "../graphql/queries/shares-query";
+import { Prompt } from "./modals/promt/Prompt";
+import { useCreateShare } from "../graphql/mutations/create-share-mutation";
 
 const { SubMenu, ItemGroup, Item } = Menu;
 
@@ -15,9 +17,18 @@ const StyledIcon = styled(Icon)`
 const NavMenu = () => {
   const [current, setCurrent] = useState("library");
   const submenuRef = useRef(null);
+  const [newShareName, setNewShareName] = useState<string | null>(null);
+  const [createShare] = useCreateShare({
+    name: newShareName || ""
+  });
 
   const handleClick = (e: ClickParam) => {
     setCurrent(e.key);
+  };
+
+  const handleCreateShare = () => {
+    createShare();
+    setNewShareName(null);
   };
 
   useEffect(() => {
@@ -74,8 +85,23 @@ const NavMenu = () => {
                 )}
               </Menu.Item>
             ))}
+          <Menu.Divider />
+          <Menu.Item key={`share:create`} onClick={() => setNewShareName("")}>
+            <Icon type="plus" />
+            New Share
+          </Menu.Item>
         </ItemGroup>
       </SubMenu>
+      {newShareName !== null && (
+        <Prompt
+          title="New Share"
+          okText="Create"
+          onSubmit={handleCreateShare}
+          onCancel={() => setNewShareName(null)}
+          onChange={e => setNewShareName(e.target.value)}
+          value={newShareName}
+        />
+      )}
     </Menu>
   );
 };

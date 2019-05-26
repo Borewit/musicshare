@@ -13,6 +13,11 @@ export interface IGetSharesVariables {
   id: string;
 }
 
+export const shareKeys = `
+	id
+	name
+`;
+
 export const GET_SHARES = gql`
   query user {
     user {
